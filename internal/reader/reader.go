@@ -67,7 +67,7 @@ func (r *fileReader) readFiles(ctx context.Context, filePaths chan walkResult) {
 
 			b := r.pool.getBuffer()
 
-			n, err := f.Read(b.buf)
+			err := b.write(f)
 			if err == io.EOF {
 				r.pool.returnBuffer(b)
 				break
@@ -76,7 +76,6 @@ func (r *fileReader) readFiles(ctx context.Context, filePaths chan walkResult) {
 				return
 			}
 
-			b.updateLength(n)
 			r.results <- counter.NewAsyncResult(b, nil)
 		}
 

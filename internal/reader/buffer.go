@@ -48,3 +48,13 @@ func (b *buffer) updateLength(length int) {
 	b.length = length
 	b.freed = false
 }
+
+func (b *buffer) write(r io.Reader) error {
+	n, err := r.Read(b.buf)
+	if err != nil {
+		return err
+	}
+
+	b.updateLength(n)
+	return nil
+}

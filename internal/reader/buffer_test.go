@@ -1,6 +1,7 @@
 package reader
 
 import (
+	"bytes"
 	"io"
 	"testing"
 
@@ -15,14 +16,16 @@ func TestBuffer(t *testing.T) {
 
 	buffer := pool.getBuffer()
 	bufferSize := len(buffer.buf)
-	actual := make([]byte, 0, bufferSize)
+	reader := &bytes.Buffer{}
 
 	for i := 0; i < bufferSize; i++ {
-		buffer.buf[i] = byte(i % 255)
+		reader.WriteByte(byte(i % 255))
 	}
-	buffer.updateLength(bufferSize)
+
+	assertions.NoError(buffer.write(reader))
 	assertions.Equal(bufferSize, buffer.length)
 
+	actual := make([]byte, 0, bufferSize)
 	for {
 		b, err := buffer.ReadByte()
 		if err == io.EOF {
